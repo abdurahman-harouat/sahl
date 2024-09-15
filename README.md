@@ -1,8 +1,12 @@
 # pie : a package manager for a linux from scratch
 
+it is a simple package manager that can install packages from source, using yaml package definition files.
+
+inspired by [pacman](https://wiki.archlinux.org/title/Pacman) and [Makepkg](https://wiki.archlinux.org/title/Makepkg), it was made for learning purposes.
+
 ## requirements :
 
-those packages are required in runtime :
+those packages are required at runtime :
 
 - libarchive
 - tar
