@@ -6,12 +6,28 @@ inspired by [pacman](https://wiki.archlinux.org/title/Pacman) and [Makepkg](http
 
 ## requirements :
 
-those packages are required at runtime :
+### runtime requirements :
 
 - libarchive
 - tar
 
+### build requirements :
+
+- go
+
+### setting up xorg envirement :
+
+```bash
+cat > .xorg_env.sh <<EOF
+export XORG_PREFIX="/usr"
+export XORG_CONFIG="--prefix=$XORG_PREFIX --sysconfdir=/etc \
+    --localstatedir=/var --disable-static"
+EOF
+```
+
 ## Usage :
+
+**note** : make sure that `XORG_PREFIX` and `XORG_CONFIG` are set correctly before installing xorg libraries
 
 ```bash
 # install a package
@@ -30,10 +46,12 @@ pie -d <package_name>
 pie -f -i <package_name>
 ```
 
-## Installation :
+## build :
 
 ```bash
-
+git clone https://github.com/abdurahman-harouat/pie.git
+cd pie
+go build
 ```
 
 ## Features :
@@ -45,6 +63,7 @@ pie -f -i <package_name>
 
 ## TODO :
 
+- [ ] automating the installation process of the pacakge manager
 - [ ] add a way to uninstall packages
 - [ ] add a way to update packages
 - [ ] add a way to search for packages in the repository
