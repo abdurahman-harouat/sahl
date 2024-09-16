@@ -45,7 +45,6 @@ pie -f -i <package_name>
 
 ## TODO :
 
-- [ ] fixing packages getting installed even if there is an error on dependency installation
 - [ ] add a way to uninstall packages
 - [ ] add a way to update packages
 - [ ] add a way to search for packages in the repository

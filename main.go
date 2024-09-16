@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"pkg_manager/utils"
+	"pie/utils"
 	"time"
 
 	"github.com/enescakir/emoji"

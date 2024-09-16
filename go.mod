@@ -1,4 +1,4 @@
-module pkg_manager
+module pie
 
 go 1.22.1
 
