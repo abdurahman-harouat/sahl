@@ -4,6 +4,8 @@ it is a simple package manager that can install packages from source, using yaml
 
 inspired by [pacman](https://wiki.archlinux.org/title/Pacman) and [Makepkg](https://wiki.archlinux.org/title/Makepkg), it was made for learning purposes.
 
+you can find the list of packages that can be installed [here](https://github.com/abdurahman-harouat/fennec-hub/tree/main/source_files)
+
 ## requirements :
 
 ### runtime requirements :
@@ -63,7 +65,8 @@ go build
 
 ## TODO :
 
-- [ ] automating the installation process of the pacakge manager
+- [ ] automating the installation process of the package manager
+- [ ] add a way to install a group of packages
 - [ ] add a way to uninstall packages
 - [ ] add a way to update packages
 - [ ] add a way to search for packages in the repository

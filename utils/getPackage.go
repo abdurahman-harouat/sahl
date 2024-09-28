@@ -41,16 +41,15 @@ func GetOrDownloadPackage(url, cacheDir, expectedMD5 string) (string, error) {
 	}
 
 	if needsDownload {
-		data, err := DownloadFile(url)
+		// Use DownloadAndSaveFile to download the package and save it to disk
+		fileName, err := DownloadAndSaveFile(url)  // This will save the file to disk and return the file name
 		if err != nil {
 			return "", err
 		}
-
-		err = os.WriteFile(filePath, data, 0644)
-		if err != nil {
-			return "", fmt.Errorf("%v Error writing package archive to file: %v", emoji.RedCircle, err)
-		}
-
+	
+		// Update filePath to the newly downloaded file
+		filePath = fileName
+	
 		if expectedMD5 != "" {
 			calculatedMD5, err := calculateMD5(filePath)
 			if err != nil {
@@ -60,9 +59,9 @@ func GetOrDownloadPackage(url, cacheDir, expectedMD5 string) (string, error) {
 				return "", fmt.Errorf("%v MD5 verification failed: expected %s, got %s", emoji.RedCircle, expectedMD5, yellow(calculatedMD5))
 			}
 		}
-
+	
 		if Verbose {
-			fmt.Printf("%v Package archive downloaded successfully\n", green(emoji.CheckMark))
+			fmt.Printf("%v Package archive downloaded successfully: %s\n", green(emoji.CheckMark), fileName)
 		}
 	}
 

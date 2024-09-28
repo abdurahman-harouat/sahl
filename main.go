@@ -178,10 +178,11 @@ func installPackage(packageName string) error {
     }
 
     yamlURL := fmt.Sprintf("https://raw.githubusercontent.com/abdurahman-harouat/fennec-hub/main/source_files/%s/OOO.yaml", packageName)
-    yamlData, err := utils.DownloadFile(yamlURL)
+    yamlData, err := utils.DownloadFile(yamlURL)  // Use the in-memory download
     if err != nil {
         return fmt.Errorf("%v Error downloading YAML file: %v", emoji.RedCircle, err)
     }
+
     if verbose {
         fmt.Printf("%v Package definition (OOO.yaml) downloaded successfully.\n", green(emoji.CheckMark))
     }
