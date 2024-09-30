@@ -30,6 +30,7 @@ type PackageDefinition struct {
 		MD5 string `yaml:"md5,omitempty"`
 	} `yaml:"additional_downloads,omitempty"`
 	Build   []string `yaml:"build"`
+    ExtractedDir string `yaml:"extracted_dir,omitempty"`
 	Install []string `yaml:"install"`
     AdditionalCommands []string `yaml:"additional_commands,omitempty"`
 }
@@ -213,14 +214,21 @@ func installPackage(packageName string) error {
         return fmt.Errorf("%v Error extracting package: %v", emoji.RedCircle, err)
     }
 
-    packageDirName := utils.RemoveExtension(filepath.Base(cachedFilePath))
-    extractedDirPath := filepath.Join(cacheDir, packageDirName)
+    // Check if extracted_dir is defined in the YAML file
+    var extractedDirPath string
+    if pkgDef.ExtractedDir != "" {
+        extractedDirPath = filepath.Join(cacheDir, pkgDef.ExtractedDir)
+    } else {
+        packageDirName := utils.RemoveExtension(filepath.Base(cachedFilePath))
+        extractedDirPath = filepath.Join(cacheDir, packageDirName)
+    }
 
+    // Change directory to the extracted directory
     err = os.Chdir(extractedDirPath)
     if err != nil {
         return fmt.Errorf("%v Error changing directory to %s: %v", emoji.RedCircle, extractedDirPath, err)
     }
-    
+
     if verbose {
         fmt.Printf("\n%v Changed directory to: %s\n", green(emoji.CheckMark), extractedDirPath)
     }

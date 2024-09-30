@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,7 +15,12 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func DownloadAndSaveFile(url string) (string, error) {
+func DownloadAndSavePackage(url, cacheDir string) (string, error) {
+	// Create the cache directory if it doesn't exist
+	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
+		return "", fmt.Errorf("%v Error creating cache directory: %v", emoji.RedCircle, err)
+	}
+
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -55,6 +61,9 @@ func DownloadAndSaveFile(url string) (string, error) {
 		fileName = urlParts[len(urlParts)-1]
 	}
 
+	// Define the full file path (save in cache directory)
+	filePath := filepath.Join(cacheDir, fileName)
+
 	// Create a progress bar
 	bar := progressbar.NewOptions64(
 		response.ContentLength,
@@ -69,10 +78,10 @@ func DownloadAndSaveFile(url string) (string, error) {
 		}),
 	)
 
-	// Create the output file
-	outFile, err := os.Create(fileName)
+	// Create the output file in the cache directory
+	outFile, err := os.Create(filePath)
 	if err != nil {
-		return "", fmt.Errorf("%v Error creating file: %v", emoji.RedCircle, err)
+		return "", fmt.Errorf("%v Error creating file in cache directory: %v", emoji.RedCircle, err)
 	}
 	defer outFile.Close()
 
@@ -82,5 +91,5 @@ func DownloadAndSaveFile(url string) (string, error) {
 		return "", fmt.Errorf("%v Error saving file: %v", emoji.RedCircle, err)
 	}
 
-	return fileName, nil
+	return filePath, nil
 }
