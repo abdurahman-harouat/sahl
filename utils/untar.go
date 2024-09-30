@@ -37,9 +37,9 @@ func UntarFile(filePath, destDir string) error {
 		packageDirPath = destDir
 	}
 
-	// Run the command to extract the file
+	// Run the command to extract the package
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%v Error extracting file: %v", emoji.RedCircle, err)
+		return fmt.Errorf("%v Error extracting package: %v", emoji.RedCircle, err)
 	}
 
 	if Verbose {

@@ -41,8 +41,8 @@ func GetOrDownloadPackage(url, cacheDir, expectedMD5 string) (string, error) {
 	}
 
 	if needsDownload {
-		// Use DownloadAndSaveFile to download the package and save it to the cache directory
-		filePath, err := DownloadAndSavePackage(url, cacheDir)  // This will save the file to the cache directory
+		var err error
+		filePath, err = DownloadAndSavePackage(url, cacheDir)  // Update filePath to the actual downloaded file path
 		if err != nil {
 			return "", err
 		}

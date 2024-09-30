@@ -211,7 +211,7 @@ func installPackage(packageName string) error {
 
     err = utils.UntarFile(cachedFilePath, cacheDir)
     if err != nil {
-        return fmt.Errorf("%v Error extracting package: %v", emoji.RedCircle, err)
+        return fmt.Errorf("%v Error extracting package: -> cachedFilePath: %s %v", emoji.RedCircle, cachedFilePath , err)
     }
 
     // Check if extracted_dir is defined in the YAML file
