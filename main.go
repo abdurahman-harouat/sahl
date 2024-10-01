@@ -33,6 +33,7 @@ type PackageDefinition struct {
     ExtractedDir string `yaml:"extracted_dir,omitempty"`
 	Install []string `yaml:"install"`
     AdditionalCommands []string `yaml:"additional_commands,omitempty"`
+    AdditionalCommandsWithSudo []string `yaml:"additional_commands_with_sudo,omitempty"`
 }
 
 var verbose bool
@@ -289,7 +290,7 @@ func installPackage(packageName string) error {
     // Runing additional commands
     for _, command := range pkgDef.AdditionalCommands {
         if verbose {
-            fmt.Printf("🧱 Running additional command: %s\n", command)
+            fmt.Printf("🧱 Running additional commands: %s\n", command)
         }
         err := utils.RunCommand(command)
         if err != nil {
@@ -299,6 +300,21 @@ func installPackage(packageName string) error {
 
     if verbose {
         fmt.Printf("%v running additional commands successfully \n", green(emoji.CheckMark))
+    }
+
+    // Runing additional commands with sudo 
+    for _, command := range pkgDef.AdditionalCommandsWithSudo {
+        if verbose {
+            fmt.Printf("🧱 Running additional commands with sudo: %s\n", command)
+        }
+        err := utils.RunCommandWithSudo(command)
+        if err != nil {
+            return fmt.Errorf("%v Error executing additional command '%s': %v", emoji.RedCircle, command, err)
+        }
+    }
+
+    if verbose {
+        fmt.Printf("%v running additional commands with sudo successfully \n", green(emoji.CheckMark))
     }
 
     return nil
