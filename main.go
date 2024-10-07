@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"pie/structs"
 	"pie/utils"
 	"time"
 
@@ -16,25 +17,6 @@ import (
 
 const rgbGray = "\033[38;2;150;150;150m" // Approximate #bdbdbd in 256-color mode
 const reset = "\033[0m" // Reset color
-
-type PackageDefinition struct {
-	PkgName           string   `yaml:"pkgname"`
-	PkgVersion        string   `yaml:"pkgver"`
-	Dependencies      []string `yaml:"dependencies,omitempty"`
-	Source            struct {
-		URL string `yaml:"url"`
-		MD5 string `yaml:"md5,omitempty"`
-	} `yaml:"source"`
-	AdditionalDownloads []struct {
-		URL string `yaml:"url"`
-		MD5 string `yaml:"md5,omitempty"`
-	} `yaml:"additional_downloads,omitempty"`
-	Build   []string `yaml:"build"`
-    ExtractedDir string `yaml:"extracted_dir,omitempty"`
-	Install []string `yaml:"install"`
-    AdditionalCommands []string `yaml:"additional_commands,omitempty"`
-    AdditionalCommandsWithSudo []string `yaml:"additional_commands_with_sudo,omitempty"`
-}
 
 var verbose bool
 
@@ -129,7 +111,7 @@ func installPackageWithDependencies(packageName string, visited map[string]bool,
         return false, fmt.Errorf("error downloading YAML file for %s: %v", packageName, err)
     }
 
-    var pkgDef PackageDefinition
+    var pkgDef structs.PackageDefinition
     err = yaml.Unmarshal(yamlData, &pkgDef)
     if err != nil {
         return false, fmt.Errorf("error parsing package definition for %s: %v", packageName, err)
@@ -180,7 +162,7 @@ func installPackage(packageName string) error {
     }
 
     yamlURL := fmt.Sprintf("https://raw.githubusercontent.com/abdurahman-harouat/fennec-hub/main/source_files/%s/OOO.yaml", packageName)
-    yamlData, err := utils.DownloadFile(yamlURL)  // Use the in-memory download
+    yamlData, err := utils.DownloadFile(yamlURL)
     if err != nil {
         return fmt.Errorf("%v Error downloading YAML file: %v", emoji.RedCircle, err)
     }
@@ -189,7 +171,7 @@ func installPackage(packageName string) error {
         fmt.Printf("%v Package definition (OOO.yaml) downloaded successfully.\n", green(emoji.CheckMark))
     }
 
-    var pkgDef PackageDefinition
+    var pkgDef structs.PackageDefinition
     err = yaml.Unmarshal(yamlData, &pkgDef)
     if err != nil {
         return fmt.Errorf("%v Error parsing package definition: %v", emoji.RedCircle, err)
