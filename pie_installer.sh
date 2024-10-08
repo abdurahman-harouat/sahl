@@ -1,5 +1,4 @@
 # todo : check dependencies , and if they do not exist , install them
-
 echo "Downloading repository ...."
 git clone https://github.com/abdurahman-harouat/pie
 cd pie
@@ -9,6 +8,7 @@ go build -o pie
 
 
 echo "installing ...."
+
 # delete older pie version if exists
 sudo rm /usr/local/bin/pie
 
