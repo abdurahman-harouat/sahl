@@ -48,6 +48,19 @@ pie -d <package_name>
 pie -f -i <package_name>
 ```
 
+## installation :
+
+**installation requirements :**
+
+- git
+- go
+
+run this command to install it:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/pie/refs/heads/main/pie_installer.sh | sh
+```
+
 ## build :
 
 ```bash
@@ -65,7 +78,8 @@ go build
 
 ## TODO :
 
-- [ ] automating the installation process of the package manager
+- [x] automating the installation process of the package manager
+- [ ] checking dependencies in the pie_installer.sh "making it more automated"
 - [ ] add a way to install a group of packages
 - [ ] add a way to uninstall packages
 - [ ] add a way to update packages
