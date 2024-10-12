@@ -1,4 +1,4 @@
-# pie : a package manager for a linux from scratch
+# sahl : a package manager for a linux from scratch
 
 it is a simple package manager that can install packages from source, using yaml package definition files.
 
@@ -33,19 +33,19 @@ EOF
 
 ```bash
 # install a package
-pie -i <package_name>
+sahl -i <package_name>
 # verbose output
-pie -v -i <package_name>
+sahl -v -i <package_name>
 # list installed packages
-pie -l
+sahl -l
 # uninstall a package
-pie -u <package_name>
+sahl -u <package_name>
 # display help
-pie -h
+sahl -h
 # check if a package is installed
-pie -d <package_name>
+sahl -d <package_name>
 # force reinstallation of a package
-pie -f -i <package_name>
+sahl -f -i <package_name>
 ```
 
 ## installation :
@@ -58,14 +58,14 @@ pie -f -i <package_name>
 run this command to install it:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/pie/refs/heads/main/pie_installer.sh | sh
+curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh
 ```
 
 ## build :
 
 ```bash
-git clone https://github.com/abdurahman-harouat/pie.git
-cd pie
+git clone https://github.com/abdurahman-harouat/sahl.git
+cd sahl
 go build
 ```
 
@@ -79,7 +79,7 @@ go build
 ## TODO :
 
 - [x] automating the installation process of the package manager
-- [ ] checking dependencies in the pie_installer.sh "making it more automated"
+- [ ] checking dependencies in the sahl_installer.sh "making it more automated"
 - [ ] add a way to install a group of packages
 - [ ] add a way to uninstall packages
 - [ ] add a way to update packages

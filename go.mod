@@ -1,4 +1,4 @@
-module pie
+module sahl
 
 go 1.22.1
 
