@@ -1,6 +1,6 @@
 # sahl : a package manager for a linux from scratch
 
-it is a simple package manager that can install packages from source, using yaml package definition files.
+it is a simple package manager that can install packages from source, using yaml package definition files on x86_64 & ARM architectures
 
 inspired by [pacman](https://wiki.archlinux.org/title/Pacman) and [Makepkg](https://wiki.archlinux.org/title/Makepkg), it was made for learning purposes.
 
@@ -53,7 +53,6 @@ sahl -f -i <package_name>
 **installation requirements :**
 
 - git
-- go
 
 run this command to install it:
 
@@ -61,6 +60,7 @@ run this command to install it:
 curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh
 
 source ~/.bashrc
+source ~/.profile
 ```
 
 ## build :
