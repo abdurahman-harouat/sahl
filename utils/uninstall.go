@@ -11,7 +11,7 @@ import (
 )
 
 func UninstallPackage(packageName string) error {
-    installPath := fmt.Sprintf("/var/lib/pie/local/%s", packageName)
+    installPath := fmt.Sprintf("/var/lib/sahl/local/%s", packageName)
 
     // Check if we're running as root
     currentUser, err := user.Current()

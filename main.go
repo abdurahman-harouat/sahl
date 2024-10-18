@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"pie/structs"
-	"pie/utils"
+	"sahl/structs"
+	"sahl/utils"
 	"time"
 
 	"github.com/enescakir/emoji"
@@ -48,7 +48,7 @@ func main() {
     verbose = *verboseFlag
 
     if *helpFlag {
-        whiteBackgroundBlackText.Println(" Usage of pie: ")
+        whiteBackgroundBlackText.Println(" Usage of sahl: ")
         pflag.PrintDefaults()
         return
     }
@@ -155,7 +155,7 @@ func installPackage(packageName string) error {
         return fmt.Errorf("%v Error getting user's home directory: %v", emoji.RedCircle, err)
     }
 
-    cacheDir := filepath.Join(homeDir, ".cache", "pie")
+    cacheDir := filepath.Join(homeDir, ".cache", "sahl")
     err = os.MkdirAll(cacheDir, 0755)
     if err != nil {
         return fmt.Errorf("%v Error creating cache directory: %v", emoji.RedCircle, err)
