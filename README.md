@@ -59,6 +59,8 @@ run this command to install it:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh
+
+source ~/.bashrc
 ```
 
 ## build :
