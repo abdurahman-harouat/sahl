@@ -35,19 +35,6 @@ else
     log_message "→ /var/log/packages.log already exists"
 fi
 
-
-# Create /etc/profile.d directory with proper permissions and ownership
-# log_message "Setting up /etc/profile.d directory..."
-# sudo install --directory --mode=0755 --owner=root --group=root /etc/profile.d
-# log_message "✓ Created /etc/profile.d directory with proper permissions and ownership"
-
-
-# Making sure that bash_competion.d directory is present
-# log_message "Adding bash_completion.d..."
-# sudo install --directory --mode=0755 --owner=root --group=root /etc/bash_completion.d
-# log_message "✓ Added bash_completion.d directory succesfully"
-
-
 # Set up environment variables
 print_section "Configuring environment variables"
 if ! grep -q "XORG_PREFIX" ~/.bashrc; then
@@ -83,8 +70,6 @@ case $ARCH in
         ;;
 esac
 log_message "Selected Go version ${GO_VERSION} for ${GO_ARCH} architecture"
-
-
 
 # Check for existing Go installation
 print_section "Checking for existing Go installation"
@@ -151,6 +136,12 @@ if git clone https://github.com/abdurahman-harouat/sahl; then
         log_message "Installing SAHL to /usr/local/bin..."
         if sudo mv sahl /usr/local/bin/ && sudo chmod +x /usr/local/bin/sahl; then
             log_message "✓ SAHL installed successfully"
+            
+            # Move out of the cloned directory and remove it
+            cd ..
+            log_message "Cleaning up SAHL repository..."
+            rm -rf sahl
+            log_message "✓ SAHL repository removed successfully"
         else
             log_message "ERROR: Failed to install SAHL"
             exit 1
