@@ -4,94 +4,95 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"os/user"
+	"strings"
 )
 
 var Verbose bool
 
 func RunCommand(command string) error {
-	// Create a shell command
-	cmd := exec.Command("sh", "-c", command)
+    // Split the command into the command name and its arguments
+    cmdArgs := strings.Fields(command)
+    cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 
-	// Set up pipes for real-time output
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return fmt.Errorf("failed to get stdout pipe: %v", err)
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return fmt.Errorf("failed to get stderr pipe: %v", err)
-	}
+    // Get the output pipe
+    stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        return fmt.Errorf("failed to get stdout pipe: %v", err)
+    }
 
-	// Start the command
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("command start failed: %v", err)
-	}
+    stderr, err := cmd.StderrPipe()
+    if err != nil {
+        return fmt.Errorf("failed to get stderr pipe: %v", err)
+    }
 
-	// Stream output in real-time
-	if Verbose {
-		go streamOutput(stdout, os.Stdout)
-		go streamOutput(stderr, os.Stderr)
-	}
+    // Start the command
+    if err := cmd.Start(); err != nil {
+        return fmt.Errorf("command start failed: %v", err)
+    }
 
-	// Wait for the command to finish
-	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("command failed: %v", err)
-	}
+    // Read and print the output in real-time if verbose is enabled
+    if Verbose {
+        go printOutput(stdout)
+        go printOutput(stderr)
+    }
 
-	return nil
+    // Wait for the command to finish
+    if err := cmd.Wait(); err != nil {
+        return fmt.Errorf("command failed: %v", err)
+    }
+
+    return nil
 }
 
-func streamOutput(src io.Reader, dest io.Writer) {
-	scanner := bufio.NewScanner(src)
-	for scanner.Scan() {
-		fmt.Fprintln(dest, scanner.Text())
-	}
+// Helper function to print output line by line
+func printOutput(pipe io.Reader) {
+    reader := bufio.NewReader(pipe)
+    for {
+        line, _, err := reader.ReadLine()
+        if err != nil {
+            if err == io.EOF {
+                break
+            }
+            fmt.Printf("error reading output: %v\n", err)
+            break
+        }
+        fmt.Println(string(line))
+    }
 }
 
 func RunCommandWithSudo(command string) error {
-	// Check if the user is a sudo user
-	currentUser, err := user.Current()
-	if err != nil {
-		return fmt.Errorf("failed to get current user: %v", err)
-	}
+    cmdArgs := strings.Fields(command)
+    var cmd *exec.Cmd
+    if currentUser, _ := user.Current(); currentUser.Uid != "0" {
+        cmd = exec.Command("sudo", append([]string{"sh", "-c"}, command)...)
+    } else {
+        cmd = exec.Command(cmdArgs[0], cmdArgs[1:]...)
+    }
 
-	var cmd *exec.Cmd
-	if currentUser.Uid != "0" {
-		// Run the command with sudo
-		cmd = exec.Command("sudo", "sh", "-c", command)
-	} else {
-		// Run the command without sudo
-		cmd = exec.Command("sh", "-c", command)
-	}
+    stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        return fmt.Errorf("failed to get stdout pipe: %v", err)
+    }
 
-	// Set up pipes for real-time output
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return fmt.Errorf("failed to get stdout pipe: %v", err)
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return fmt.Errorf("failed to get stderr pipe: %v", err)
-	}
+    stderr, err := cmd.StderrPipe()
+    if err != nil {
+        return fmt.Errorf("failed to get stderr pipe: %v", err)
+    }
 
-	// Start the command
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("command start failed: %v", err)
-	}
+    if err := cmd.Start(); err != nil {
+        return fmt.Errorf("command start failed: %v", err)
+    }
 
-	// Stream output in real-time
-	if Verbose {
-		go streamOutput(stdout, os.Stdout)
-		go streamOutput(stderr, os.Stderr)
-	}
+    if Verbose {
+        go printOutput(stdout)
+        go printOutput(stderr)
+    }
 
-	// Wait for the command to finish
-	if err := cmd.Wait(); err != nil {
-		return fmt.Errorf("command failed: %v", err)
-	}
+    if err := cmd.Wait(); err != nil {
+        return fmt.Errorf("command failed: %v", err)
+    }
 
-	return nil
+    return nil
 }
