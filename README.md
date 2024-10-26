@@ -13,10 +13,6 @@ you can find the list of packages that can be installed [here](https://github.co
 - libarchive
 - tar
 
-### build requirements :
-
-- go
-
 ### setting up xorg envirement :
 
 ```bash
