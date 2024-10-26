@@ -1,57 +1,108 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"os/user"
-	"strings"
+	"sync"
 )
 
 var Verbose bool
 
-// RunCommand executes a shell command and handles output based on verbosity
+// captureOutput reads from a pipe and writes to both a buffer and os.Stdout/os.Stderr
+func captureOutput(pipe io.ReadCloser, isStderr bool) (string, error) {
+	var output string
+	scanner := bufio.NewScanner(pipe)
+	
+	for scanner.Scan() {
+		line := scanner.Text()
+		output += line + "\n"
+		if Verbose {
+			if isStderr {
+				fmt.Fprintln(os.Stderr, line)
+			} else {
+				fmt.Fprintln(os.Stdout, line)
+			}
+		}
+	}
+	
+	return output, scanner.Err()
+}
+
 func RunCommand(command string) error {
 	// Create a shell command
 	cmd := exec.Command("sh", "-c", command)
 
-	// Set up output pipes
-	var stdout, stderr strings.Builder
-	if Verbose {
-		// Use MultiWriter to capture output and also display it
-		cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
-		cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
-	} else {
-		// Just capture output without displaying it
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
+	// Create pipes for stdout and stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stdout pipe: %v", err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stderr pipe: %v", err)
 	}
 
-	// Run the command
-	err := cmd.Run()
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start command: %v", err)
+	}
+
+	// Use WaitGroup to ensure we capture all output
+	var wg sync.WaitGroup
+	var stdoutStr, stderrStr string
+	var stdoutErr, stderrErr error
+
+	// Capture stdout
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		stdoutStr, stdoutErr = captureOutput(stdout, false)
+	}()
+
+	// Capture stderr
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		stderrStr, stderrErr = captureOutput(stderr, true)
+	}()
+
+	// Wait for output capturing to complete
+	wg.Wait()
+
+	// Check for errors in output capturing
+	if stdoutErr != nil {
+		return fmt.Errorf("error capturing stdout: %v", stdoutErr)
+	}
+	if stderrErr != nil {
+		return fmt.Errorf("error capturing stderr: %v", stderrErr)
+	}
+
+	// Wait for command to complete
+	err = cmd.Wait()
 	if err != nil {
-		// Construct detailed error message
 		errMsg := fmt.Sprintf("command failed: %v", err)
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			errMsg = fmt.Sprintf("command failed with exit code %d", exitErr.ExitCode())
 		}
-
-		// Add captured output to error message if there was any
-		if stderr.Len() > 0 {
-			errMsg += fmt.Sprintf("\nError output:\n%s", stderr.String())
+		
+		// Include captured output in error message
+		if stderrStr != "" {
+			errMsg += fmt.Sprintf("\nError output:\n%s", stderrStr)
 		}
-		if stdout.Len() > 0 {
-			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdout.String())
+		if stdoutStr != "" {
+			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdoutStr)
 		}
-
+		
 		return fmt.Errorf("%s", errMsg)
 	}
 
 	return nil
 }
 
-// RunCommandWithSudo executes a shell command with sudo if necessary
 func RunCommandWithSudo(command string) error {
 	// Check if the user is a sudo user
 	currentUser, err := user.Current()
@@ -68,35 +119,67 @@ func RunCommandWithSudo(command string) error {
 		cmd = exec.Command("sh", "-c", command)
 	}
 
-	// Set up output pipes
-	var stdout, stderr strings.Builder
-	if Verbose {
-		// Use MultiWriter to capture output and also display it
-		cmd.Stdout = io.MultiWriter(os.Stdout, &stdout)
-		cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
-	} else {
-		// Just capture output without displaying it
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
+	// Create pipes for stdout and stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stdout pipe: %v", err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stderr pipe: %v", err)
 	}
 
-	// Run the command
-	err = cmd.Run()
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start command: %v", err)
+	}
+
+	// Use WaitGroup to ensure we capture all output
+	var wg sync.WaitGroup
+	var stdoutStr, stderrStr string
+	var stdoutErr, stderrErr error
+
+	// Capture stdout
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		stdoutStr, stdoutErr = captureOutput(stdout, false)
+	}()
+
+	// Capture stderr
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		stderrStr, stderrErr = captureOutput(stderr, true)
+	}()
+
+	// Wait for output capturing to complete
+	wg.Wait()
+
+	// Check for errors in output capturing
+	if stdoutErr != nil {
+		return fmt.Errorf("error capturing stdout: %v", stdoutErr)
+	}
+	if stderrErr != nil {
+		return fmt.Errorf("error capturing stderr: %v", stderrErr)
+	}
+
+	// Wait for command to complete
+	err = cmd.Wait()
 	if err != nil {
-		// Construct detailed error message
 		errMsg := fmt.Sprintf("command failed: %v", err)
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			errMsg = fmt.Sprintf("command failed with exit code %d", exitErr.ExitCode())
 		}
-
-		// Add captured output to error message if there was any
-		if stderr.Len() > 0 {
-			errMsg += fmt.Sprintf("\nError output:\n%s", stderr.String())
+		
+		// Include captured output in error message
+		if stderrStr != "" {
+			errMsg += fmt.Sprintf("\nError output:\n%s", stderrStr)
 		}
-		if stdout.Len() > 0 {
-			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdout.String())
+		if stdoutStr != "" {
+			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdoutStr)
 		}
-
+		
 		return fmt.Errorf("%s", errMsg)
 	}
 
