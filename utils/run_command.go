@@ -7,100 +7,48 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
-	"sync"
 )
 
 var Verbose bool
-
-// captureOutput reads from a pipe and writes to both a buffer and os.Stdout/os.Stderr
-func captureOutput(pipe io.ReadCloser, isStderr bool) (string, error) {
-	var output string
-	scanner := bufio.NewScanner(pipe)
-	
-	for scanner.Scan() {
-		line := scanner.Text()
-		output += line + "\n"
-		if Verbose {
-			if isStderr {
-				fmt.Fprintln(os.Stderr, line)
-			} else {
-				fmt.Fprintln(os.Stdout, line)
-			}
-		}
-	}
-	
-	return output, scanner.Err()
-}
 
 func RunCommand(command string) error {
 	// Create a shell command
 	cmd := exec.Command("sh", "-c", command)
 
-	// Create pipes for stdout and stderr
+	// Set up pipes for real-time output
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("failed to create stdout pipe: %v", err)
+		return fmt.Errorf("failed to get stdout pipe: %v", err)
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("failed to create stderr pipe: %v", err)
+		return fmt.Errorf("failed to get stderr pipe: %v", err)
 	}
 
 	// Start the command
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to start command: %v", err)
+		return fmt.Errorf("command start failed: %v", err)
 	}
 
-	// Use WaitGroup to ensure we capture all output
-	var wg sync.WaitGroup
-	var stdoutStr, stderrStr string
-	var stdoutErr, stderrErr error
-
-	// Capture stdout
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		stdoutStr, stdoutErr = captureOutput(stdout, false)
-	}()
-
-	// Capture stderr
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		stderrStr, stderrErr = captureOutput(stderr, true)
-	}()
-
-	// Wait for output capturing to complete
-	wg.Wait()
-
-	// Check for errors in output capturing
-	if stdoutErr != nil {
-		return fmt.Errorf("error capturing stdout: %v", stdoutErr)
-	}
-	if stderrErr != nil {
-		return fmt.Errorf("error capturing stderr: %v", stderrErr)
+	// Stream output in real-time
+	if Verbose {
+		go streamOutput(stdout, os.Stdout)
+		go streamOutput(stderr, os.Stderr)
 	}
 
-	// Wait for command to complete
-	err = cmd.Wait()
-	if err != nil {
-		errMsg := fmt.Sprintf("command failed: %v", err)
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			errMsg = fmt.Sprintf("command failed with exit code %d", exitErr.ExitCode())
-		}
-		
-		// Include captured output in error message
-		if stderrStr != "" {
-			errMsg += fmt.Sprintf("\nError output:\n%s", stderrStr)
-		}
-		if stdoutStr != "" {
-			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdoutStr)
-		}
-		
-		return fmt.Errorf("%s", errMsg)
+	// Wait for the command to finish
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("command failed: %v", err)
 	}
 
 	return nil
+}
+
+func streamOutput(src io.Reader, dest io.Writer) {
+	scanner := bufio.NewScanner(src)
+	for scanner.Scan() {
+		fmt.Fprintln(dest, scanner.Text())
+	}
 }
 
 func RunCommandWithSudo(command string) error {
@@ -119,68 +67,30 @@ func RunCommandWithSudo(command string) error {
 		cmd = exec.Command("sh", "-c", command)
 	}
 
-	// Create pipes for stdout and stderr
+	// Set up pipes for real-time output
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("failed to create stdout pipe: %v", err)
+		return fmt.Errorf("failed to get stdout pipe: %v", err)
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("failed to create stderr pipe: %v", err)
+		return fmt.Errorf("failed to get stderr pipe: %v", err)
 	}
 
 	// Start the command
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to start command: %v", err)
+		return fmt.Errorf("command start failed: %v", err)
 	}
 
-	// Use WaitGroup to ensure we capture all output
-	var wg sync.WaitGroup
-	var stdoutStr, stderrStr string
-	var stdoutErr, stderrErr error
-
-	// Capture stdout
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		stdoutStr, stdoutErr = captureOutput(stdout, false)
-	}()
-
-	// Capture stderr
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		stderrStr, stderrErr = captureOutput(stderr, true)
-	}()
-
-	// Wait for output capturing to complete
-	wg.Wait()
-
-	// Check for errors in output capturing
-	if stdoutErr != nil {
-		return fmt.Errorf("error capturing stdout: %v", stdoutErr)
-	}
-	if stderrErr != nil {
-		return fmt.Errorf("error capturing stderr: %v", stderrErr)
+	// Stream output in real-time
+	if Verbose {
+		go streamOutput(stdout, os.Stdout)
+		go streamOutput(stderr, os.Stderr)
 	}
 
-	// Wait for command to complete
-	err = cmd.Wait()
-	if err != nil {
-		errMsg := fmt.Sprintf("command failed: %v", err)
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			errMsg = fmt.Sprintf("command failed with exit code %d", exitErr.ExitCode())
-		}
-		
-		// Include captured output in error message
-		if stderrStr != "" {
-			errMsg += fmt.Sprintf("\nError output:\n%s", stderrStr)
-		}
-		if stdoutStr != "" {
-			errMsg += fmt.Sprintf("\nCommand output:\n%s", stdoutStr)
-		}
-		
-		return fmt.Errorf("%s", errMsg)
+	// Wait for the command to finish
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("command failed: %v", err)
 	}
 
 	return nil
