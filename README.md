@@ -57,6 +57,9 @@ curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/m
 
 source ~/.bashrc
 source ~/.profile
+
+# now install libarchive as some packages require it
+sahl -i libarchive
 ```
 
 ## build :
