@@ -19,24 +19,24 @@ for arg in "$@"; do
     if [ "$arg" == "--with-startup-files" ]; then
         mkdir -p bash_startup_files
         cd bash_startup_files
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_logout
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_profile
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bashrc
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.profile
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_logout
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_profile
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bashrc
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.profile
         cp .bash_logout .bash_profile .bashrc .profile ~
         mkdir -p etc
         cd etc
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/bashrc
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/bashrc
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile
         sudo cp -v bashrc profile /etc/
         mkdir -p profile.d
         cd profile.d
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/bash_completion.sh
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/extrapaths.sh
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/i18n.sh
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/readline.sh
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/umask.sh
-        curl -O https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/dircolors.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/bash_completion.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/extrapaths.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/i18n.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/readline.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/umask.sh
+        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/dircolors.sh
         sudo install --directory --mode=0755 --owner=root --group=root /etc/profile.d
         sudo install --directory --mode=0755 --owner=root --group=root /etc/bash_completion.d
         sudo cp -v bash_completion.sh extrapaths.sh i18n.sh readline.sh umask.sh dircolors.sh /etc/profile.d/
