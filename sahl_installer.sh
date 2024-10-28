@@ -84,6 +84,48 @@ else
     log_message "→ XORG environment variables already exist in .bashrc"
 fi
 
+# Check for make-ca installation 
+print_section "Checking make-ca installation"
+if [ -f /usr/sbin/make-ca ]; then
+    echo "make-ca is already installed"
+else
+    log_message "make-ca not found. Installing make-ca..."
+
+    wget --no-check-certificate -q "https://github.com/lfs-book/make-ca/archive/v1.14/make-ca-1.14.tar.gz" &&
+    tar -xzf make-ca-1.14.tar.gz &&
+    cd make-ca-1.14 &&
+    sudo make install &&
+    sudo install -vdm755 /etc/ssl/local &&
+    sudo /usr/sbin/make-ca -g &&
+    sudo systemctl enable update-pki.timer &&
+
+    wget "http://www.cacert.org/certs/root.crt" &&
+    wget "http://www.cacert.org/certs/class3.crt" &&
+    sudo openssl x509 -in root.crt -text -fingerprint -setalias "CAcert Class 1 root" \
+        -addtrust serverAuth -addtrust emailProtection -addtrust codeSigning \
+        | sudo tee /etc/ssl/local/CAcert_Class_1_root.pem > /dev/null &&
+    sudo openssl x509 -in class3.crt -text -fingerprint -setalias "CAcert Class 3 root" \
+        -addtrust serverAuth -addtrust emailProtection -addtrust codeSigning \
+        | sudo tee /etc/ssl/local/CAcert_Class_3_root.pem > /dev/null &&
+    sudo /usr/sbin/make-ca -r &&
+
+    sudo mkdir -pv /etc/profile.d &&
+    sudo tee /etc/profile.d/pythoncerts.sh > /dev/null << "EOF6"
+# Begin /etc/profile.d/pythoncerts.sh
+
+export _PIP_STANDALONE_CERT=/etc/pki/tls/certs/ca-bundle.crt
+
+# End /etc/profile.d/pythoncerts.sh
+EOF6
+
+    log_message "make-ca installation and configuration completed successfully."
+    
+    # Clean up downloaded and extracted files
+    cd .. &&
+    rm -rf make-ca-1.14 make-ca-1.14.tar.gz root.crt class3.crt
+fi
+
+
 # Determine system architecture
 print_section "Detecting system architecture"
 ARCH=$(uname -m)
