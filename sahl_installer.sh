@@ -19,24 +19,24 @@ for arg in "$@"; do
     if [ "$arg" == "--with-startup-files" ]; then
         mkdir -p bash_startup_files
         cd bash_startup_files
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_logout
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_profile
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bashrc
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.profile
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_logout
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bash_profile
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.bashrc
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/.profile
         cp .bash_logout .bash_profile .bashrc .profile ~
         mkdir -p etc
         cd etc
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/bashrc
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/bashrc
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile
         sudo cp -v bashrc profile /etc/
         mkdir -p profile.d
         cd profile.d
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/bash_completion.sh
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/extrapaths.sh
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/i18n.sh
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/readline.sh
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/umask.sh
-        wget -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/dircolors.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/bash_completion.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/extrapaths.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/i18n.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/readline.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/umask.sh
+        wget --no-check-certificate -q https://github.com/abdurahman-harouat/sahl/raw/refs/heads/main/bash_startup_files/etc/profile.d/dircolors.sh
         sudo install --directory --mode=0755 --owner=root --group=root /etc/profile.d
         sudo install --directory --mode=0755 --owner=root --group=root /etc/bash_completion.d
         sudo cp -v bash_completion.sh extrapaths.sh i18n.sh readline.sh umask.sh dircolors.sh /etc/profile.d/
@@ -118,7 +118,7 @@ else
     GO_URL="https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
     log_message "Downloading Go from: ${GO_URL}"
     
-    if wget "$GO_URL"; then
+    if wget --no-check-certificate "$GO_URL"; then
         log_message "✓ Download completed successfully"
         
         log_message "Extracting Go archive..."

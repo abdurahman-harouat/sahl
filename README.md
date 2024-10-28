@@ -54,10 +54,12 @@ run this command to install it:
 
 ```bash
 # if you have already setup bash startup files
-wget -qO- https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh
+wget --no-check-certificate https://raw.githubusercontent.com/abdurahman-harouat/sahl/main/sahl_installer.sh -O sahl_installer.sh
+bash sahl_installer.sh
 
 # if you have not setup bash startup files you can add the --with-startup-files flag
-wget -qO- https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh -s -- --with-startup-files
+wget --no-check-certificate https://raw.githubusercontent.com/abdurahman-harouat/sahl/main/sahl_installer.sh -O sahl_installer.sh
+bash sahl_installer.sh --with-startup-files
 
 source ~/.bashrc
 source ~/.profile
