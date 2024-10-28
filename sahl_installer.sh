@@ -126,6 +126,106 @@ EOF6
 fi
 
 
+# Check for libunistring installation 
+print_section "Checking libunistring installation"
+if [ -d /usr/include/unistring ]; then
+    echo "libunistring is already installed"
+else
+    log_message "libunistring not found. Installing libunistring..."
+
+    wget -q "https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.xz" &&
+    tar -xzf libunistring-1.2.tar.xz &&
+    cd libunistring-1.2 &&
+    ./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/libunistring-1.2 &&
+    make &&
+    sudo make install
+
+    log_message "libunistring installation completed successfully."
+    
+    # Clean up downloaded and extracted files
+    cd .. &&
+    rm -rf libunistring-1.2 libunistring-1.2.tar.xz
+fi
+
+# Check for libidn2 installation 
+print_section "Checking libidn2 installation"
+if [ -d /usr/share/gtk-doc/html/libidn2 ]; then
+    echo "libidn2 is already installed"
+else
+    log_message "libidn2 not found. Installing libidn2..."
+
+    wget -q "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz" &&
+    tar -xzf libidn2-2.3.7.tar.gz &&
+    cd libidn2-2.3.7 &&
+    ./configure --prefix=/usr --disable-static &&
+    make &&
+    sudo make install
+
+    log_message "libidn2 installation completed successfully."
+    
+    # Clean up downloaded and extracted files
+    cd .. &&
+    rm -rf libidn2-2.3.7 libidn2-2.3.7.tar.gz
+fi
+
+# Check for libpsl installation 
+print_section "Checking libpsl installation"
+if command -v psl &> /dev/null; then
+    echo "libpsl is already installed"
+else
+    log_message "libpsl not found. Installing libpsl..."
+
+    wget -q "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz" &&
+    tar -xzf libpsl-0.21.5.tar.gz &&
+    cd libpsl-0.21.5 &&
+    mkdir -p build &&
+    cd build &&
+    meson setup --prefix=/usr --buildtype=release &&
+    ninja &&
+    sudo ninja install
+
+    log_message "libpsl installation completed successfully."
+    
+    # Clean up downloaded and extracted files
+    cd ../.. &&
+    rm -rf libpsl-0.21.5 libpsl-0.21.5.tar.gz
+fi
+
+# Check for curl installation 
+print_section "Checking curl installation"
+if command -v curl &> /dev/null; then
+    echo "curl is already installed"
+else
+    log_message "curl not found. Installing curl..."
+
+    wget -q "https://curl.se/download/curl-8.9.1.tar.xz" &&
+    tar -xzf curl-8.9.1.tar.xz &&
+    cd curl-8.9.1 &&
+    ./configure --prefix=/usr                           \
+            --disable-static                        \
+            --with-openssl                          \
+            --enable-threaded-resolver              \
+            --with-ca-path=/etc/ssl/certs &&
+    make &&
+    sudo make install &&
+    sudo rm -rf docs/examples/.deps &&
+    sudo find docs \( -name Makefile\* -o  \
+                -name \*.1       -o  \
+                -name \*.3       -o  \
+                -name CMakeLists.txt \) -delete &&
+    sudo cp -v -R docs -T /usr/share/doc/curl-8.9.1
+
+
+    log_message "curl installation completed successfully."
+    
+    # Clean up downloaded and extracted files
+    cd .. &&
+    rm -rf curl-8.9.1 curl-8.9.1.tar.xz
+fi
+
+
 # Determine system architecture
 print_section "Detecting system architecture"
 ARCH=$(uname -m)
