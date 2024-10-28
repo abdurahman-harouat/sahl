@@ -118,7 +118,7 @@ else
     GO_URL="https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
     log_message "Downloading Go from: ${GO_URL}"
     
-    if wget --no-check-certificate "$GO_URL"; then
+    if wget --no-check-certificate -q "$GO_URL"; then
         log_message "✓ Download completed successfully"
         
         log_message "Extracting Go archive..."
@@ -148,6 +148,37 @@ else
         exit 1
     fi
 fi
+
+
+# Check for Git installation
+print_section "Checking Git installation"
+if command -v git &> /dev/null; then
+    GIT_VERSION=$(git --version | awk '{print $3}')
+    log_message "Git is already installed (version ${GIT_VERSION})"
+else
+    log_message "Git not found. Installing Git..."
+    
+    wget --no-check-certificate -q https://www.kernel.org/pub/software/scm/git/git-2.46.0.tar.xz
+    tar -xf git-2.46.0.tar.xz
+    cd git-2.46.0
+    ./configure --prefix=/usr \
+            --with-gitconfig=/etc/gitconfig \
+            --with-python=python3 &&
+    make
+
+    sudo make perllibdir=/usr/lib/perl5/5.38.2/site_perl install
+
+
+    if command -v git &> /dev/null; then
+        GIT_VERSION=$(git --version | awk '{print $3}')
+        log_message "✓ Git installed successfully (version ${GIT_VERSION})"
+        echo "git ${GIT_VERSION} installed on $(date)" | sudo tee -a /var/log/packages.log
+    else
+        log_message "ERROR: Git installation failed"
+        exit 1
+    fi
+fi
+
 
 # Install SAHL
 print_section "Installing SAHL"
