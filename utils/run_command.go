@@ -1,90 +1,36 @@
 package utils
 
 import (
-	"bufio"
 	"fmt"
-	"io"
+	"os"
 	"os/exec"
 	"os/user"
 	"strings"
-	"sync"
 )
 
 var Verbose bool
 
-// CommandOutput stores both stdout and stderr
-type CommandOutput struct {
-    Stdout string
-    Stderr string
-}
-
 func RunCommand(command string) error {
     cmdArgs := strings.Fields(command)
     cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+    
+    // Connect command's stdout and stderr directly to the terminal
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    
+    // Also connect stdin in case the command needs interactive input
+    cmd.Stdin = os.Stdin
 
-    // Create pipes for both stdout and stderr
-    stdout, err := cmd.StdoutPipe()
-    if err != nil {
-        return fmt.Errorf("failed to get stdout pipe: %v", err)
+    if Verbose {
+        fmt.Printf("\033[1;34m=>\033[0m Running: %s\n", command)
     }
 
-    stderr, err := cmd.StderrPipe()
+    err := cmd.Run()
     if err != nil {
-        return fmt.Errorf("failed to get stderr pipe: %v", err)
-    }
-
-    // Buffer to store output
-    var stdoutBuf, stderrBuf strings.Builder
-    var wg sync.WaitGroup
-
-    // Start the command
-    if err := cmd.Start(); err != nil {
-        return fmt.Errorf("command start failed: %v", err)
-    }
-
-    // Read both stdout and stderr concurrently
-    wg.Add(2)
-    go func() {
-        defer wg.Done()
-        readOutput(stdout, &stdoutBuf, true) // true for stdout
-    }()
-    go func() {
-        defer wg.Done()
-        readOutput(stderr, &stderrBuf, false) // false for stderr
-    }()
-
-    // Wait for both goroutines to complete
-    wg.Wait()
-
-    // Wait for the command to finish
-    err = cmd.Wait()
-    if err != nil {
-        // If there was an error, show both stdout and stderr
-        if stdoutBuf.Len() > 0 {
-            fmt.Printf("Command output:\n%s\n", stdoutBuf.String())
-        }
-        if stderrBuf.Len() > 0 {
-            fmt.Printf("Error output:\n%s\n", stderrBuf.String())
-        }
-        return fmt.Errorf("command failed: %v\nError output: %s", err, stderrBuf.String())
+        return fmt.Errorf("command failed: %v", err)
     }
 
     return nil
-}
-
-func readOutput(pipe io.Reader, buffer *strings.Builder, isStdout bool) {
-    scanner := bufio.NewScanner(pipe)
-    for scanner.Scan() {
-        line := scanner.Text()
-        if Verbose {
-            if isStdout {
-                fmt.Printf("➜ %s\n", line)
-            } else {
-                fmt.Printf("❯ %s\n", line)
-            }
-        }
-        buffer.WriteString(line + "\n")
-    }
 }
 
 func RunCommandWithSudo(command string) error {
@@ -101,51 +47,20 @@ func RunCommandWithSudo(command string) error {
         cmd = exec.Command(cmdArgs[0], cmdArgs[1:]...)
     }
 
-    // Create pipes for both stdout and stderr
-    stdout, err := cmd.StdoutPipe()
-    if err != nil {
-        return fmt.Errorf("failed to get stdout pipe: %v", err)
+    // Connect command's stdout and stderr directly to the terminal
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    
+    // Also connect stdin in case the command needs interactive input
+    cmd.Stdin = os.Stdin
+
+    if Verbose {
+        fmt.Printf("\033[1;34m=>\033[0m Running with sudo: %s\n", command)
     }
 
-    stderr, err := cmd.StderrPipe()
+    err = cmd.Run()
     if err != nil {
-        return fmt.Errorf("failed to get stderr pipe: %v", err)
-    }
-
-    // Buffer to store output
-    var stdoutBuf, stderrBuf strings.Builder
-    var wg sync.WaitGroup
-
-    // Start the command
-    if err := cmd.Start(); err != nil {
-        return fmt.Errorf("command start failed: %v", err)
-    }
-
-    // Read both stdout and stderr concurrently
-    wg.Add(2)
-    go func() {
-        defer wg.Done()
-        readOutput(stdout, &stdoutBuf, true)
-    }()
-    go func() {
-        defer wg.Done()
-        readOutput(stderr, &stderrBuf, false)
-    }()
-
-    // Wait for both goroutines to complete
-    wg.Wait()
-
-    // Wait for the command to finish
-    err = cmd.Wait()
-    if err != nil {
-        // If there was an error, show both stdout and stderr
-        if stdoutBuf.Len() > 0 {
-            fmt.Printf("Command output:\n%s\n", stdoutBuf.String())
-        }
-        if stderrBuf.Len() > 0 {
-            fmt.Printf("Error output:\n%s\n", stderrBuf.String())
-        }
-        return fmt.Errorf("command failed: %v\nError output: %s", err, stderrBuf.String())
+        return fmt.Errorf("command failed: %v", err)
     }
 
     return nil
