@@ -53,12 +53,13 @@ sahl -f -i <package_name>
 run this command to install it:
 
 ```bash
-# if you have already setup bash startup files
+# download installer
 wget --no-check-certificate https://raw.githubusercontent.com/abdurahman-harouat/sahl/main/sahl_installer.sh -O sahl_installer.sh
+
+# if you have already setup bash startup files
 bash sahl_installer.sh
 
 # if you have not setup bash startup files you can add the --with-startup-files flag
-wget --no-check-certificate https://raw.githubusercontent.com/abdurahman-harouat/sahl/main/sahl_installer.sh -O sahl_installer.sh
 bash sahl_installer.sh --with-startup-files
 
 source ~/.bashrc
