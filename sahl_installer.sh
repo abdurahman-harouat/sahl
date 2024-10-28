@@ -199,27 +199,30 @@ if command -v git &> /dev/null; then
     log_message "Git is already installed (version ${GIT_VERSION})"
 else
     log_message "Git not found. Installing Git..."
-    
-    wget --no-check-certificate -q https://www.kernel.org/pub/software/scm/git/git-2.46.0.tar.xz
-    tar -xf git-2.46.0.tar.xz
-    cd git-2.46.0
+
+    wget -q https://www.kernel.org/pub/software/scm/git/git-2.46.0.tar.xz &&
+    tar -xf git-2.46.0.tar.xz &&
+    cd git-2.46.0 &&
     ./configure --prefix=/usr \
             --with-gitconfig=/etc/gitconfig \
             --with-python=python3 &&
-    make
-
+    make &&
     sudo make perllibdir=/usr/lib/perl5/5.38.2/site_perl install
-
 
     if command -v git &> /dev/null; then
         GIT_VERSION=$(git --version | awk '{print $3}')
         log_message "✓ Git installed successfully (version ${GIT_VERSION})"
         echo "git ${GIT_VERSION} installed on $(date)" | sudo tee -a /var/log/packages.log
+
+        # Cleanup: remove downloaded files and extracted folder
+        cd .. &&
+        rm -rf git-2.46.0 git-2.46.0.tar.xz
     else
         log_message "ERROR: Git installation failed"
         exit 1
     fi
 fi
+
 
 
 # Install SAHL
