@@ -53,7 +53,11 @@ sahl -f -i <package_name>
 run this command to install it:
 
 ```bash
+# if you have already setup bash startup files
 curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh
+
+# if you have not setup bash startup files you can add the --with-startup-files flag
+curl -sSL https://raw.githubusercontent.com/abdurahman-harouat/sahl/refs/heads/main/sahl_installer.sh | sh -s -- --with-startup-files
 
 source ~/.bashrc
 source ~/.profile
