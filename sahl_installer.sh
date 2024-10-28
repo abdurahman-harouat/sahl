@@ -12,6 +12,16 @@ print_section() {
     echo "================================================================"
 }
 
+# setting bash startup files
+print_section "Setting up bash startup files"
+# Iterate over all arguments
+for arg in "$@"; do
+    if [ "$arg" == "--with-startup-files" ]; then
+        
+    fi
+done
+
+
 # Create required directories if they don't exist
 print_section "Setting up system directories"
 if [ ! -d /var ]; then
