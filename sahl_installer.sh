@@ -92,7 +92,7 @@ else
     log_message "make-ca not found. Installing make-ca..."
 
     wget --no-check-certificate -q "https://github.com/lfs-book/make-ca/archive/v1.14/make-ca-1.14.tar.gz" &&
-    tar -xzf make-ca-1.14.tar.gz &&
+    tar -xf make-ca-1.14.tar.gz &&
     cd make-ca-1.14 &&
     sudo make install &&
     sudo install -vdm755 /etc/ssl/local &&
@@ -134,9 +134,9 @@ else
     log_message "libunistring not found. Installing libunistring..."
 
     wget -q "https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.xz" &&
-    tar -xzf libunistring-1.2.tar.xz &&
+    tar -xf libunistring-1.2.tar.xz &&
     cd libunistring-1.2 &&
-    ./configure --prefix=/usr    \
+    ./configure --prefix=/usr \
             --disable-static \
             --docdir=/usr/share/doc/libunistring-1.2 &&
     make &&
@@ -157,7 +157,7 @@ else
     log_message "libidn2 not found. Installing libidn2..."
 
     wget -q "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz" &&
-    tar -xzf libidn2-2.3.7.tar.gz &&
+    tar -xf libidn2-2.3.7.tar.gz &&
     cd libidn2-2.3.7 &&
     ./configure --prefix=/usr --disable-static &&
     make &&
@@ -178,7 +178,7 @@ else
     log_message "libpsl not found. Installing libpsl..."
 
     wget -q "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz" &&
-    tar -xzf libpsl-0.21.5.tar.gz &&
+    tar -xf libpsl-0.21.5.tar.gz &&
     cd libpsl-0.21.5 &&
     mkdir -p build &&
     cd build &&
@@ -201,7 +201,7 @@ else
     log_message "curl not found. Installing curl..."
 
     wget -q "https://curl.se/download/curl-8.9.1.tar.xz" &&
-    tar -xzf curl-8.9.1.tar.xz &&
+    tar -xf curl-8.9.1.tar.xz &&
     cd curl-8.9.1 &&
     ./configure --prefix=/usr                           \
             --disable-static                        \
