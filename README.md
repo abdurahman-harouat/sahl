@@ -82,7 +82,7 @@ go build
 - [x] - install from source
 - [x] - md5 checksum verification
 - [x] - dependency resolution
-- [ ] - install multiple packages at once
+- [x] - install multiple packages at once
 
 ## TODO :
 

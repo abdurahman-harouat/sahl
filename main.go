@@ -30,7 +30,7 @@ func main() {
 	whiteBackgroundBlackText := boldBlack.Add(color.BgWhite)
 
 	// Define flags using pflag, adding short flags
-	installFlag := pflag.StringP("install", "i", "", "Install a package")
+	installFlag := pflag.BoolP("install", "i", false, "Install packages (use space-separated names for multiple packages)")
 	helpFlag := pflag.BoolP("help", "h", false, "Display help")
 	listFlag := pflag.BoolP("list", "l", false, "List installed packages")
 	uninstallFlag := pflag.StringP("uninstall", "r", "", "Uninstall a package")
@@ -48,22 +48,30 @@ func main() {
 		return
 	}
 
-	if *installFlag != "" {
-		packageName := *installFlag
-		forceReinstall := *forceFlag
-		forceReinstallWithDeps := *forceDependenciesFlag
-		visited := make(map[string]bool)
+	if *installFlag {
+        packages := pflag.Args() // Get all arguments after flags
+        if len(packages) == 0 {
+            fmt.Println("No packages specified for installation.")
+            return
+        }
 
-		installed, err := installPackageWithDependencies(packageName, visited, forceReinstall, forceReinstallWithDeps)
-		if err != nil {
-			fmt.Printf("Failed to install package %s: %v\n", packageName, err)
-		} else if installed {
-			fmt.Printf("%s[✓] Package %s was successfully installed%s\n", green(""), packageName, reset)
-		} else {
-			fmt.Printf("Package %s was already installed\n", packageName)
-		}
-		return
-	}
+        forceReinstall := *forceFlag
+        forceReinstallWithDeps := *forceDependenciesFlag
+        visited := make(map[string]bool)
+
+        for _, packageName := range packages {
+            fmt.Printf("\nInstalling package: %s\n", packageName)
+            installed, err := installPackageWithDependencies(packageName, visited, forceReinstall, forceReinstallWithDeps)
+            if err != nil {
+                fmt.Printf("Failed to install package %s: %v\n", packageName, err)
+            } else if installed {
+                fmt.Printf("%s[✓] Package %s was successfully installed%s\n", green(""), packageName, reset)
+            } else {
+                fmt.Printf("Package %s was already installed\n", packageName)
+            }
+        }
+        return
+    }
 
 	if *listFlag {
 		whiteBackgroundBlackText.Printf("Installed packages:%s", reset)
