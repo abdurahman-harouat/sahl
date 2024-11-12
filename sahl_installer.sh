@@ -78,6 +78,7 @@ if ! grep -q "XORG_PREFIX" ~/.bashrc; then
         echo '# XORG Configuration'
         echo 'export XORG_PREFIX="/usr"'
         echo 'export XORG_CONFIG="--prefix=$XORG_PREFIX --sysconfdir=/etc --localstatedir=/var --disable-static"'
+        echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"'
     } >> ~/.bashrc
     log_message "✓ Environment variables added successfully"
 else

@@ -9,13 +9,19 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/enescakir/emoji"
 	"github.com/fatih/color"
+)
+
+const (
+	statusSuccess = "[SUCCESS]"
+	statusWarning = "[WARNING]"
+	statusError   = "[ERROR]"
 )
 
 func GetOrDownloadPackage(url, cacheDir, expectedMD5 string) (string, error) {
 	green := color.New(color.FgGreen).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
 
 	fileName := path.Base(url)
 	filePath := filepath.Join(cacheDir, fileName)
@@ -30,42 +36,42 @@ func GetOrDownloadPackage(url, cacheDir, expectedMD5 string) (string, error) {
 			}
 			if calculatedMD5 == expectedMD5 {
 				needsDownload = false
-				fmt.Printf("%v Package archive already exists and MD5 matches\n", green(emoji.CheckMark))
+				fmt.Printf("%s Package archive already exists and MD5 matches\n", green(statusSuccess))
 			} else {
-				fmt.Printf("%v Package archive already exists but MD5 does not match\n", yellow(emoji.Warning))
+				fmt.Printf("%s Package archive exists but MD5 does not match\n", yellow(statusWarning))
 			}
 		} else {
 			needsDownload = false
-			fmt.Printf("%v Package archive already exists, skipping MD5 check\n", green(emoji.CheckMark))
+			fmt.Printf("%s Package archive exists, skipping MD5 check\n", green(statusSuccess))
 		}
 	}
 
 	if needsDownload {
 		var err error
-		filePath, err = DownloadAndSavePackage(url, cacheDir)  // Update filePath to the actual downloaded file path
+		filePath, err = DownloadAndSavePackage(url, cacheDir)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("%s Failed to download package: %v", red(statusError), err)
 		}
 
 		if expectedMD5 != "" {
 			calculatedMD5, err := calculateMD5(filePath)
 			if err != nil {
-				return "", err
+				return "", fmt.Errorf("%s Failed to calculate MD5: %v", red(statusError), err)
 			}
 			if calculatedMD5 != expectedMD5 {
-				return "", fmt.Errorf("%v MD5 verification failed: expected %s, got %s", emoji.RedCircle, expectedMD5, yellow(calculatedMD5))
+				return "", fmt.Errorf("%s MD5 verification failed: expected %s, got %s", 
+					red(statusError), expectedMD5, yellow(calculatedMD5))
 			}
 		}
 
 		if Verbose {
-			fmt.Printf("%v Package archive downloaded successfully: %s\n", green(emoji.CheckMark), filePath)
+			fmt.Printf("%s Package downloaded successfully: %s\n", 
+				green(statusSuccess), filePath)
 		}
 	}
 
 	return filePath, nil
 }
-
-
 
 func calculateMD5(filePath string) (string, error) {
 	file, err := os.Open(filePath)
