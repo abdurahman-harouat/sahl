@@ -71,19 +71,28 @@ else
 fi
 
 # Set up environment variables
-print_section "Configuring environment variables"
+print_section "Configuring environment variables ....."
+
 if ! grep -q "XORG_PREFIX" ~/.bashrc; then
-    log_message "Adding XORG environment variables to .bashrc..."
+    log_message "Adding XORG_PREFIX environment variable to .bashrc..."
     {
         echo '# XORG Configuration'
         echo 'export XORG_PREFIX="/usr"'
         echo 'export XORG_CONFIG="--prefix=$XORG_PREFIX --sysconfdir=/etc --localstatedir=/var --disable-static"'
-        echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"'
     } >> ~/.bashrc
-    log_message "✓ Environment variables added successfully"
+    log_message "✓ XORG_PREFIX environment variable added successfully"
 else
-    log_message "→ XORG environment variables already exist in .bashrc"
+    log_message "→ XORG_PREFIX environment variable already exists in .bashrc"
 fi
+
+if ! grep -q "PKG_CONFIG_PATH" ~/.bashrc; then
+    log_message "Adding PKG_CONFIG_PATH environment variable to .bashrc..."
+    echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc
+    log_message "✓ PKG_CONFIG_PATH environment variable added successfully"
+else
+    log_message "→ PKG_CONFIG_PATH environment variable already exists in .bashrc"
+fi
+
 
 # Check for make-ca installation 
 print_section "Checking make-ca installation"
