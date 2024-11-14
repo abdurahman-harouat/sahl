@@ -32,7 +32,7 @@ func DownloadAndSavePackage(url, cacheDir string) (string, error) {
 	}
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   200 * time.Second,
+		Timeout:   2000 * time.Second,
 	}
 
 	response, err := client.Get(url)
