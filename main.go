@@ -176,19 +176,21 @@ func installPackage(packageName string) error {
 		return fmt.Errorf("[✗] Error parsing package definition: %v", err)
 	}
 
-	cachedFilePath, err := utils.GetOrDownloadPackage(pkgDef.Source.URL, cacheDir, pkgDef.Source.MD5)
+	// Main package file retrieval with integrity check for the main source package
+	cachedFilePath, err := utils.GetOrDownloadPackage(pkgDef.Source.URL, cacheDir, pkgDef.Source.MD5, pkgDef.Source.SHA512)
 	if err != nil {
-		return fmt.Errorf("[✗] Error getting package file: %v", err)
+		return fmt.Errorf("[x] Error getting package file: %v", err)
 	}
 
-	// Download additional packages
+	// Download additional packages with integrity check
 	for _, additional := range pkgDef.AdditionalDownloads {
 		fmt.Printf("[*] Downloading additional package: %s\n", additional.URL)
-		_, err := utils.GetOrDownloadPackage(additional.URL, cacheDir, additional.MD5)
+		_, err := utils.GetOrDownloadPackage(additional.URL, cacheDir, additional.MD5, additional.SHA512)
 		if err != nil {
-			return fmt.Errorf("[✗] Error getting additional package file: %v", err)
+			return fmt.Errorf("[x] Error getting additional package file: %v", err)
 		}
 	}
+
 
 	err = utils.UntarFile(cachedFilePath, cacheDir)
 	if err != nil {
